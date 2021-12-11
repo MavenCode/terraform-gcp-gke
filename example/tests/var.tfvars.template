@@ -1,0 +1,8 @@
+gcp_project_id          = "project-id"
+name_prefix             = "dev"
+zone                    = "us-central1-c"
+gke_machine_type        = "e2-standard-2"
+network                 = "default"
+subnetwork              = "default"
+min_node_count          = 1
+max_node_count          = 5
