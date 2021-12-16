@@ -1,55 +1,43 @@
 resource "google_container_cluster" "main_gke_cluster" {
     provider   = google-beta
-    name       = "${var.name_prefix}-cluster"
-    location   = var.zone
+    name       = "${var.cluster_name}-cluster"
+    location   = var.region
     network    = var.network
     subnetwork = var.subnetwork
 
-    remove_default_node_pool = true
-    initial_node_count = var.gke_node_count
-
-    node_config {
-        machine_type = var.gke_machine_type
-
-        workload_metadata_config {
-            mode = "GKE_METADATA"
-        }
+    private_cluster_config {
+      enable_private_endpoint = false
+      enable_private_nodes    = true
+      master_ipv4_cidr_block  = var.gke_master_ipv4_cidr_block
     }
 
-    addons_config {
-
-        istio_config {
-
-        disabled = false
-        auth     = "AUTH_NONE"
-
-        }
-
+    master_authorized_networks_config {
+      dynamic "cidr_blocks" {
+          for_each = var.authorized_source_ranges
+          content {
+              cidr_block = cidr_blocks.value
+          }
+      }
+    }
+    maintenance_policy {
+      recurring_window {
+        start_time = "2021-12-18T00:00:00Z"
+        end_time   = "2050-01-01T04:00:00Z"
+        recurrence = "FREQ=WEEKLY"
+      }
     }
 
-    workload_identity_config {
-        workload_pool = "${var.gcp_project_id}.svc.id.goog"
+    # Enable Autopilot for this cluster
+    enable_autopilot = true
+
+    # Configuration of cluster IP allocation for VPC-native clusters
+    ip_allocation_policy {
+      cluster_secondary_range_name  = var.cluster_secondary_range_name
+      services_secondary_range_name = var.services_secondary_range_name
     }
 
-}
-
-resource "google_container_node_pool" "primary_nodes" {
-  provider   = google-beta
-  name       = "default-node-pool"
-  cluster    = google_container_cluster.main_gke_cluster.name
-  location   = var.zone
-
-  node_count = var.gke_node_count
-
-  autoscaling {
-    min_node_count = var.min_node_count
-    max_node_count = var.max_node_count
-  }
-
-
-}
-
-data "google_container_cluster" "main_gke_cluster" {
-  location = var.zone
-  name     = google_container_cluster.main_gke_cluster.name
+    # Configuration options for the Release channel feature, which provide more control over automatic upgrades of your GKE clusters.
+    release_channel {
+      channel = var.channel
+    }
 }

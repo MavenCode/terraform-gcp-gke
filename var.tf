@@ -1,37 +1,39 @@
-variable "gcp_project_id" {
+variable "project_id" {
   description = "GCP project name"
 }
 
-variable "name_prefix" {
-  description = "Prefix to be used when naming the different components of Feast"
+variable "cluster_name" {
+  description = "GKE Cluster name"
 }
 
-variable "zone" {
-  description = "zone for GKE"
-}
-
-variable "gke_machine_type" {
-  description = "GKE node pool machine type"
-  default     = "n1-standard-2"
-}
-
-variable "gke_node_count" {
-  description = "Number of nodes in the GKE default node pool"
-  default     = 1
+variable "region" {
+  description = "region for GKE cluster"
 }
 
 variable "network" {
-  description = "Network for GKE and Dataproc cluster"
+  description = "Network for GKE cluster"
 }
 
 variable "subnetwork" {
-  description = "Subnetwork for GKE and Dataproc cluster"
+  description = "Subnetwork for GKE cluster"
 }
 
-variable "max_node_count" {
-  description = "max node count"
+variable "gke_master_ipv4_cidr_block" {
+  type    = string
+  default = "172.23.0.0/28"
 }
 
-variable "min_node_count" {
-  description = "min node count"
+variable "cluster_secondary_range_name" {
+  type    = string
+  default = "pods"
+}
+
+variable "services_secondary_range_name" {
+  type    = string
+  default = "services"
+}
+
+variable "channel" {
+  type    = string
+  default = "REGULAR"
 }
