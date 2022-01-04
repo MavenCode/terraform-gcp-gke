@@ -18,6 +18,10 @@ variable "subnetwork" {
   description = "Subnetwork for GKE cluster"
 }
 
+variable "authorized_source_ranges" {
+  description = "Authorized source ranges that can access GKE" 
+}
+
 variable "gke_master_ipv4_cidr_block" {
   type    = string
   default = "172.23.0.0/28"
